@@ -1,0 +1,13 @@
+django
+python-dotenv
+python-telegram-bot==13.15
+djoser
+stripe
+psycopg2-binary
+djangorestframework
+djangorestframework-simplejwt
+drf-yasg
+gunicorn
+pillow
+django-cors-headers
+
