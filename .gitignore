@@ -220,3 +220,5 @@ __marimo__/
 .streamlit/secrets.toml
 /AI_CONTEXT.md
 .idea
+errors
+logs

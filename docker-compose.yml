@@ -19,6 +19,7 @@ services:
 
   tgbot:
     build: .
+    command: sh -c "python manage.py migrate --noinput && python manage.py collectstatic --noinput && gunicorn config.wsgi --bind 0.0.0.0:8000 --workers 2 --timeout 60"
     volumes:
       - .:/app
       - static_volume:/app/staticfiles
