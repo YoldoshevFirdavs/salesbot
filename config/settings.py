@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
+
 import logging
 import logging.handlers
 import os
@@ -42,16 +43,21 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 if not SECRET_KEY:
     if DEBUG:
-        logger.warning("SECRET_KEY not found in environment. Using a default, insecure key for development.")
+        logger.warning(
+            "SECRET_KEY not found in environment. Using a default, insecure key for development."
+        )
         SECRET_KEY = "django-insecure-fallback-for-development-only"
     else:
-        raise ImproperlyConfigured("The DJANGO_SECRET_KEY environment variable must be set in production.")
+        raise ImproperlyConfigured(
+            "The DJANGO_SECRET_KEY environment variable must be set in production."
+        )
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
 
-ALLOWED_HOSTS = [h.strip() for h in os.getenv("DJANGO_ALLOWED_HOSTS", "").split(",") if h.strip()]
-
+ALLOWED_HOSTS = [
+    h.strip() for h in os.getenv("DJANGO_ALLOWED_HOSTS", "").split(",") if h.strip()
+]
 
 
 # Application definition
@@ -71,8 +77,6 @@ INSTALLED_APPS = [
     "tgbot",
     "dashboard",
     "users",
-
-
 ]
 
 MIDDLEWARE = [
@@ -207,11 +211,10 @@ SIMPLE_JWT = {
     "JTI_CLAIM": "jti",
     "SLIDING_TOKEN_LIFETIME": timedelta(minutes=60),
     "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=7),
-
 }
 
 
-BOT_TOKEN=os.getenv("BOT_TOKEN")
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 _env_log_file = os.getenv("LOG_FILE", "")
 if _env_log_file:
@@ -244,7 +247,9 @@ class SensitiveDataFilter(logging.Filter):
             for field in ["password", "otp", "secret", "token"]:
                 # Fix: Use re.escape and a simpler regex pattern without lookbehind
                 pattern = re.escape(field) + r"[:=]\s*(\S+)"
-                record.msg = re.sub(pattern, field + ": ********", record.msg, flags=re.IGNORECASE)
+                record.msg = re.sub(
+                    pattern, field + ": ********", record.msg, flags=re.IGNORECASE
+                )
 
         return True
 
@@ -314,7 +319,9 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
     }
 }
-SESSION_ENGINE = "django.contrib.sessions.backends.db" # kesh o'rniga bazaga saqlagani oson
+SESSION_ENGINE = (
+    "django.contrib.sessions.backends.db"  # kesh o'rniga bazaga saqlagani oson
+)
 
 API_BASE_URL = os.getenv("API_BASE_URL", "http://127.0.0.1:8000")
 PHONENUMBER_DEFAULT_REGION = "UZ"
@@ -337,18 +344,3 @@ SESSION_COOKIE_AGE = 1800  # 30 minutes
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Session persists after browser close
 ADMIN_SESSION_TIMEOUT = 1800  # 30 minutes for admin sessions
 ADMIN_SESSION_DURATION = 1800  # 30 minutes for admin sessions
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

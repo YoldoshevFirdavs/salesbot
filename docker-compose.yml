@@ -26,9 +26,10 @@ services:
       - media_volume:/app/media
       - logs_volume:/app/logs
     environment:
+      - DEBUG=${DEBUG:-False}  # Agar .env da yozilmasa, avtomat False bo'ladi
+      - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS:-localhost:8000,localhost,127.0.0.1:8000,127.0.0.1}
       - PYTHONUNBUFFERED=1
       - LOG_FILE=/app/logs/django.log
-      - DEBUG=True
       - IS_DOCKER=true
       - DB_HOST=db
     ports:
