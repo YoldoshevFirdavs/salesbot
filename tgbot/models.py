@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.db import models
 from django.db.models import Q
+from django.utils.text import slugify
+
 
 class ProductManager(models.Manager):
     def search(self, query):
@@ -8,15 +10,15 @@ class ProductManager(models.Manager):
 
 class ProductAvailableManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(is_active=True, stock_gt=0)
+        return super().get_queryset().filter(is_active=True, stock__gt=0)
 
     def search(self, query):
         return self.get_queryset().filter(Q(name__icontains=query) | Q(description__icontains=query)).distinct()
 
 class Product(models.Model):
     name = models.CharField(max_length=255, db_index=True)
-    slug = models.SlugField(unique=True, db_index=True)
-    category = models.ForeignKey("Category", on_delete=models.PROTECT, related_name="medicines")
+    slug = models.SlugField(unique=True, db_index=True, blank=True)
+    category = models.ForeignKey("Category", on_delete=models.PROTECT, related_name="medicines", blank=True, null=True)
 
     price = models.DecimalField(max_digits=12, decimal_places=2)
     stock = models.PositiveIntegerField(default=0)
@@ -38,6 +40,19 @@ class Product(models.Model):
             self.save()
             return True
         return False
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            # Nomidan slug yasaymiz, masalan: "Smartfon 12" -> "smartfon-12"
+            base_slug = slugify(self.name)
+            slug = base_slug
+            counter = 1
+            # Agar bunday slug bazada allaqachon mavjud bo'lsa, oxiriga raqam qo'shib ketamiz
+            while Product.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
@@ -102,7 +117,7 @@ class CartItem(models.Model):
 
 class Order(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="orders")
-    total_price = models.DecimalField(max_digits=12, decimal_places=2)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2,)
     status = models.CharField(
         max_length=20, choices=OrderStatus.choices, default=OrderStatus.PENDING, help_text="Order status"
     )
