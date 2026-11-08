@@ -16,7 +16,10 @@ class ProductAvailableManager(models.Manager):
         return self.get_queryset().filter(Q(name__icontains=query) | Q(description__icontains=query)).distinct()
 
 class Product(models.Model):
-    name = models.CharField(max_length=255, db_index=True)
+    name_uz = models.CharField(max_length=255, db_index=True, null=True, blank=True)
+    name_ru = models.CharField(max_length=255, db_index=True, null=True, blank=True)
+    name_eng = models.CharField(max_length=255, db_index=True, null=True, blank=True)
+
     slug = models.SlugField(unique=True, db_index=True, blank=True)
     category = models.ForeignKey("Category", on_delete=models.PROTECT, related_name="medicines", blank=True, null=True)
 
@@ -24,7 +27,10 @@ class Product(models.Model):
     stock = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
 
-    description = models.CharField(max_length=500)
+    description_uz = models.CharField(max_length=500, null=True, blank=True)
+    description_ru = models.CharField(max_length=500, null=True, blank=True)
+    description_eng = models.CharField(max_length=500, null=True, blank=True)
+
     main_image = models.ImageField(upload_to="products/main/", null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -32,7 +38,7 @@ class Product(models.Model):
     available = ProductAvailableManager()
 
     def __str__(self):
-        return self.name
+        return self.name_uz or self.name_ru or self.name_eng or f"Product {self.id}"
 
     def reduce_stock(self, quantity):
         if quantity <= self.stock:
@@ -44,7 +50,7 @@ class Product(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             # Nomidan slug yasaymiz, masalan: "Smartfon 12" -> "smartfon-12"
-            base_slug = slugify(self.name)
+            base_slug = slugify(self.name_uz or self.name_ru or self.name_eng or "")
             slug = base_slug
             counter = 1
             # Agar bunday slug bazada allaqachon mavjud bo'lsa, oxiriga raqam qo'shib ketamiz
@@ -55,7 +61,9 @@ class Product(models.Model):
         super().save(*args, **kwargs)
 
 class Category(models.Model):
-    name = models.CharField(max_length=255)
+    name_uz = models.CharField(max_length=255, default='')
+    name_ru = models.CharField(max_length=255, default='')
+    name_eng = models.CharField(max_length=255, default='')
     slug = models.SlugField(max_length=255, unique=True)
     parent = models.ForeignKey(
         "self",
@@ -69,12 +77,12 @@ class Category(models.Model):
     class Meta:
         verbose_name = "Category"
         verbose_name_plural = "Categories"
-        ordering = ["name"]
+        ordering = ["name_uz"]
 
     def __str__(self):
         if self.parent:
-            return f"{self.parent.name} -> {self.name}"
-        return self.name
+            return f"{self.parent.name_uz} -> {self.name_uz}"
+        return self.name_uz
 
 class ProductImage(models.Model):
     medicine = models.ForeignKey(Product, related_name="images", on_delete=models.CASCADE)

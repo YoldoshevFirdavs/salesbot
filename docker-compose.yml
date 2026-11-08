@@ -17,7 +17,7 @@ services:
       timeout: 5s
       retries: 5
 
-  tgbot:
+  web:
     build: .
     command: sh -c "python manage.py migrate --noinput && python manage.py collectstatic --noinput && gunicorn config.wsgi --bind 0.0.0.0:8000 --workers 2 --timeout 60"
     volumes:
@@ -26,7 +26,7 @@ services:
       - media_volume:/app/media
       - logs_volume:/app/logs
     environment:
-      - DEBUG=${DEBUG:-False}  # Agar .env da yozilmasa, avtomat False bo'ladi
+      - DEBUG=${DEBUG:-False}
       - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS:-localhost:8000,localhost,127.0.0.1:8000,127.0.0.1}
       - PYTHONUNBUFFERED=1
       - LOG_FILE=/app/logs/django.log
@@ -39,6 +39,24 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+  tgbot:
+     build: .
+     restart: always
+     command: python tgbot/tgb/runbot.py
+     dns:
+       - 8.8.8.8
+       - 1.1.1.1
+     volumes:
+       - .:/app
+       - media_volume:/app/media
+     env_file:
+       - .env
+     environment:
+       - PYTHONUNBUFFERED=1
+     depends_on:
+       db:
+         condition: service_healthy
 
 volumes:
   postgres_data:

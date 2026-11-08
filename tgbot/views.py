@@ -21,8 +21,8 @@ class ProductViewSet(viewsets.ModelViewSet):
         filters.SearchFilter,
         filters.OrderingFilter,
     ]
-    filterset_fields = ["category"]
-    search_fields = ["name", "description"]
+    filterset_fields = ["category__name_uz", "category__name_ru", "category__name_eng"]
+    search_fields = ["name_uz", "name_ru", "name_eng", "description_uz", "description_ru", "description_eng"]
     ordering_fields = ["price", "updated_at"]
 
     def get_serializer_class(self):

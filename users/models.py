@@ -55,10 +55,16 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    phone_number = models.CharField(max_length=32, unique=True, null=False, blank=False)
+    phone_number = models.CharField(max_length=32, unique=True, null=True, blank=True)
     email = models.EmailField(unique=True, null=True, blank=True)
+
     telegram_id = models.CharField(max_length=255, unique=True, null=True, blank=True)
     is_verified = models.BooleanField(default=False)
+    chat_id = models.BigIntegerField(unique=True, null=True, blank=True)
+    state = models.IntegerField(default=1, null=True, blank=True)
+    language = models.IntegerField(default=1, null=True, blank=True)
+
+
 
     full_name = models.CharField(max_length=255, blank=True)
     address = models.CharField(max_length=255, blank=True)

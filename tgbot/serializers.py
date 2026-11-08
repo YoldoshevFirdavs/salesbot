@@ -17,10 +17,14 @@ class RecursiveField(serializers.Serializer):
 
 class CategorySerializer(serializers.ModelSerializer):
     children = RecursiveField(many=True, read_only=True)
+    name = serializers.CharField(source="name_uz", read_only=True)
+    name_uz = serializers.CharField(source="name_uz", read_only=True)
+    name_ru = serializers.CharField(source="name_ru", read_only=True)
+    name_eng = serializers.CharField(source="name_eng", read_only=True)
 
     class Meta:
         model = Category
-        fields = ["id", "name", "slug", "parent", "is_default", "children"]
+        fields = ["id", "name", "name_uz", "name_ru", "name_eng", "slug", "parent", "is_default", "children"]
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
@@ -32,12 +36,17 @@ class ProductImageSerializer(serializers.ModelSerializer):
 class ProductListSerializer(serializers.ModelSerializer):
     category = serializers.ReadOnlyField(source="category.name")
     image_url = serializers.SerializerMethodField()
+    name_uz = serializers.CharField(source="name_uz", read_only=True)
+    name_ru = serializers.CharField(source="name_ru", read_only=True)
+    name_eng = serializers.CharField(source="name_eng", read_only=True)
 
     class Meta:
         model = Product
         fields = [
             "id",
-            "name",
+            "name_uz",
+            "name_ru",
+            "name_eng",
             "slug",
             "category",
             "price",
@@ -78,11 +87,20 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     main_image_url = serializers.SerializerMethodField()
     slug = serializers.SlugField(read_only=True)
     price = serializers.DecimalField(max_digits=10, decimal_places=2)
+    name_uz = serializers.CharField(source="name_uz", read_only=True)
+    name_ru = serializers.CharField(source="name_ru", read_only=True)
+    name_eng = serializers.CharField(source="name_eng", read_only=True)
+    description_uz = serializers.CharField(source="description_uz", read_only=True)
+    description_ru = serializers.CharField(source="description_ru", read_only=True)
+    description_eng = serializers.CharField(source="description_eng", read_only=True)
+    
     class Meta:
         model = Product
         fields = [
             "id",
-            "name",
+            "name_uz",
+            "name_ru",
+            "name_eng",
             "slug",
             "category",
             "price",
@@ -90,8 +108,9 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             "main_image",
             "main_image_url",
             "images",
-            "description",
-
+            "description_uz",
+            "description_ru",
+            "description_eng",
         ]
 
     def get_main_image_url(self, obj):
@@ -135,11 +154,13 @@ class CartSummarySerializer(serializers.ModelSerializer):
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
-    product_name = serializers.ReadOnlyField(source="product.name")
+    product_name = serializers.ReadOnlyField(source="product.name_uz")
+    product_name_ru = serializers.ReadOnlyField(source="product.name_ru")
+    product_name_eng = serializers.ReadOnlyField(source="product.name_eng")
 
     class Meta:
         model = OrderItem
-        fields = ["id", "product", "product_name", "quantity", "price_at_order"]
+        fields = ["id", "product", "product_name", "product_name_ru", "product_name_eng", "quantity", "price_at_order"]
 
     def create(self, validated_data):
         items_data = validated_data.pop('items')
