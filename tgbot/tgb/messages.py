@@ -20,15 +20,18 @@ def message_handler(update, context):
 
             if message == globals.BTN_LANG_UZ:
                 db.update_user_data(user.id, 'language', 1)
+                set_bot_commands(context.bot, 1, user.id)
                 logger.info(f"🌍 LANGUAGE: User {user.id} (@{user.username}) selected language: Uzbek")
                 check_user(update, context)
 
             elif message == globals.BTN_LANG_RU:
                 db.update_user_data(user.id, "language", 2)
+                set_bot_commands(context.bot, 2, user.id)
                 logger.info(f"🌍 LANGUAGE: User {user.id} (@{user.username}) selected language: Russian")
                 check_user(update, context)
             elif message == globals.BTN_LANG_ENG:
-                db.update_user_data(user.id, "language", 1)
+                db.update_user_data(user.id, "language", 3)
+                set_bot_commands(context.bot, 3, user.id)
                 logger.info(f"🌍 LANGUAGE: User {user.id} (@{user.username}) selected language: English")
                 check_user(update, context)
             else:
@@ -115,16 +118,19 @@ def message_handler(update, context):
     elif state == 3:
         if message == globals.BTN_LANG_UZ:
             db.update_user_data(db_user['chat_id'], "language", 1)
+            set_bot_commands(context.bot, 1, db_user['chat_id'])
             context.user_data["state"] = globals.STATES["reg"]
             check_user(update, context)
 
         elif message == globals.BTN_LANG_RU:
             db.update_user_data(db_user['chat_id'], "language", 2)
+            set_bot_commands(context.bot, 2, db_user['chat_id'])
             context.user_data["state"] = globals.STATES["reg"]
             check_user(update, context)
 
         elif message == globals.BTN_LANG_ENG:
             db.update_user_data(db_user['chat_id'], 'language', 3)
+            set_bot_commands(context.bot, 3, db_user['chat_id'])
             context.user_data["state"] = globals.STATES["reg"]
             check_user(update, context)
         else:
@@ -133,5 +139,3 @@ def message_handler(update, context):
             )
     else:
         update.message.reply_text("Salom")
-
-
