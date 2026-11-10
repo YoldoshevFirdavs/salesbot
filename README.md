@@ -459,7 +459,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👨‍💻 Author
 
-**Ramzi** - *SalesBot Creator*
+**Firdavs** - *SalesBot Creator*
 - GitHub: [@yourusername](https://github.com/yourusername)
 - Telegram: [@yourhandle](https://t.me/yourhandle)
 - Email: your.email@example.com
@@ -487,7 +487,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 <div align="center">
 
-Made with ❤️ by Ramzi
+Made with ❤️ by Firdavs
 
 ⭐ If you find this project helpful, please give it a star!
 

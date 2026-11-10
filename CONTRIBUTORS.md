@@ -6,7 +6,7 @@ Thank you to all the amazing people who have contributed to SalesBot! 🙌
 
 ## 🌟 Core Team
 
-### Ramzi
+### Firdavs
 **Role:** Founder & Lead Developer
 
 <details>
@@ -51,7 +51,7 @@ Thank you to all the amazing people who have contributed to SalesBot! 🙌
 
 ### Code Contributions 💻
 Writing and improving code:
-- [Ramzi](#ramzi) - Core features
+- [Firdavs](#firdavs) - Core features
 
 ### Bug Fixes 🐛
 Finding and fixing bugs:
@@ -67,7 +67,7 @@ Writing tests and QA:
 
 ### Design 🎨
 UI/UX design and improvements:
-- [Ramzi](#ramzi) - Frontend design
+- [Firdavs](#firdavs) - Frontend design
 
 ### Translation 🌍
 Translating to other languages:
@@ -98,12 +98,12 @@ Other:         ░░░░░░░░░░░░░░░░░░  5%
 ## 🏆 Hall of Fame
 
 ### Top Contributors
-1. 🥇 Ramzi - 100+ commits
+1. 🥇 Firdavs - 100+ commits
 2. 🥈 [Waiting for you!]
 3. 🥉 [Waiting for you!]
 
 ### Most Reviews
-1. Ramzi - 50+ reviews
+1. Firdavs - 50+ reviews
 2. [Waiting for you!]
 3. [Waiting for you!]
 

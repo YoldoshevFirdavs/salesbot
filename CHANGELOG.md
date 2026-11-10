@@ -239,14 +239,14 @@ docker-compose up -d
 ## Contributors
 
 ### Version 1.2.0
-- 👤 Ramzi - Premium UI/UX design
+- 👤 Firdavs - Premium UI/UX design
 - 👤 Team - Testing and feedback
 
 ### Version 1.1.0
 - 👤 Contributors team
 
 ### Version 1.0.0
-- 👤 Ramzi - Initial development
+- 👤 Firdavs - Initial development
 
 ---
 
