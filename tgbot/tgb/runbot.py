@@ -16,6 +16,7 @@ import bot_globals as globals
 import bot_methods
 from bot_commands import set_bot_commands
 from telegram import Update
+from tgbot.tgb.logger import logger
 
 TOKEN = BOT_TOKEN
 db = Database()
@@ -34,7 +35,6 @@ def my_orders_handler(update: Update, context: CallbackContext):
         return
     lang = db_user.get('language', 1)
     orders = db.get_user_orders(db_user.get('id'))
-    orders = db.get_user_orders(db_user['id'])
 
     if not orders or orders.count() == 0:
         update.message.reply_text(
@@ -62,14 +62,28 @@ def contact_handler(update, context):
     check_user(update, context)
 
 def location_handler(update, context):
-    ADMIN_ID = 7672818786  # Replace with your admin telegram ID
+    ADMIN_ID = os.getenv("ADMIN_ID")  # Replace with your admin telegram ID
     
     db_user = db.get_user_by_chat_id(update.message.from_user.id)
     location = update.message.location
-    payment_type = context.user_data.get("payment_type", 1)
+    payment_type = context.user_data.get("payment_type")
+    if not payment_type:
+        update.message.reply_text("Iltimos, to'lov turini qayta tanlang")
+        return
     
     address = "Lat: {}, Lon: {}".format(location.latitude, location.longitude)
     phone_number = db_user.get('phone_number', 'Nomalum')
+    
+    # Validate phone number
+    from order_utils import validate_phone
+    is_valid, formatted_phone = validate_phone(phone_number)
+    if not is_valid:
+        # Allow continuation but log warning
+        logger.warning(f"📞 INVALID PHONE: User {db_user['chat_id']} has invalid phone: {phone_number}")
+        formatted_phone = phone_number  # Use as-is
+    else:
+        phone_number = formatted_phone
+    
     payment_method = "cash" if payment_type == 1 else "card"
     
     db.create_order(db_user['id'], context.user_data.get("carts", {}), payment_method, address, phone_number)

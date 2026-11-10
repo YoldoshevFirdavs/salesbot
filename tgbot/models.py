@@ -150,19 +150,3 @@ class Order(models.Model):
         return f"Order #{self.id} - {self.user.full_name or self.user.phone_number}"
 
 
-class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="order_items")
-    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
-    quantity = models.PositiveIntegerField()
-    price_at_order = models.DecimalField(max_digits=12, decimal_places=2)
-
-    def __str__(self):
-        return f"{self.product.name if self.product else 'Deleted'} x {self.quantity}"
-
-
-
-
-
-
-
-

@@ -3,7 +3,7 @@ from decimal import Decimal
 
 import psycopg2
 from django.db import transaction
-from tgbot.models import Category, Product, Order, OrderItem, OrderStatus
+from tgbot.models import Category, Product, Order, OrderStatus
 from users.models import CustomUser
 from tgbot.tgb.logger import logger
 
@@ -92,6 +92,7 @@ class Database:
                 'name_ru': prod.name_ru,
                 'name_eng': prod.name_eng,
                 'price': float(prod.price),
+                'stock': prod.stock,
                 'description': prod.description_uz or '',
                 'description_uz': prod.description_uz or '',
                 'description_ru': prod.description_ru or '',
@@ -115,6 +116,7 @@ class Database:
                 'name_ru': product.name_ru,
                 'name_eng': product.name_eng,
                 'price': float(product.price),
+                'stock': product.stock,
                 'description': product.description_uz or '',
                 'description_uz': product.description_uz or '',
                 'description_ru': product.description_ru or '',
@@ -134,6 +136,7 @@ class Database:
                 'name_ru': product.name_ru,
                 'name_eng': product.name_eng,
                 'price': float(product.price),
+                'stock': product.stock,
                 'description': product.description_uz or '',
                 'description_uz': product.description_uz or '',
                 'description_ru': product.description_ru or '',
@@ -147,45 +150,6 @@ class Database:
         return None
 
 
-
-    def create_order(self, user_id, products_dict, payment_method, address, phone_number):
-        with transaction.atomic():
-            total_price = Decimal('0.00')
-            items_to_create = []
-            for product_id, quantity in products_dict.items():
-                product = Product.available.filter(id=int(product_id)).first()
-                if product:
-                    qty = int(quantity)
-                    item_total = product.price * qty
-                    total_price += item_total
-
-                    items_to_create.append({
-                        'product': product,
-                        'quantity': qty,
-                        'price_at_order': product.price
-                    })
-
-            order = Order.objects.create(
-                user_id=user_id,
-                total_price=total_price,
-                address=address,
-                phone_number=phone_number,
-                payment_method=payment_method,
-                status="Pending"
-            )
-            logger.info(f"🛒 ORDER: User {user_id} placed order #{order.id}, total: {total_price}")
-
-            for item in items_to_create:
-                OrderItem.objects.create(
-                    order=order,
-                    product=item['product'],
-                    quantity=item['quantity'],
-                    price_at_order=item['price_at_order']
-                )
-                item['product'].reduce_stock(item['quantity'])
-
-
-
     def get_user_orders(self, user_id):
         active_orders = Order.objects.filter(user=user_id).exclude(
             status__in=[
@@ -193,10 +157,21 @@ class Database:
                 OrderStatus.CANCELED,
                 OrderStatus.RETURNED
             ]
-        ).prefetch_related('order_items__product').order_by('-created_at')
+        ).order_by('-created_at')
 
         return active_orders
 
     def get_order_products(self, order_id):
-        return OrderItem.objects.filter(order_id=order_id).select_related('product')
+        """Returns order details (simplified - no OrderItem)"""
+        try:
+            order = Order.objects.get(id=order_id)
+            return {
+                'id': order.id,
+                'total_price': order.total_price,
+                'status': order.status,
+                'payment_method': order.payment_method,
+                'phone_number': order.phone_number,
+            }
+        except Order.DoesNotExist:
+            return None
 

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from tgbot.models import Category, ProductImage, Product, CartItem, Cart, Order, OrderItem
+from tgbot.models import Category, ProductImage, Product, CartItem, Cart, Order
 
 DEFAULT_AVATAR_URL = "/static/images/default/default_avatar.png"
 DEFAULT_PRODUCT_URL = "/static/images/default/default_product.png"
@@ -153,38 +153,6 @@ class CartSummarySerializer(serializers.ModelSerializer):
 
 
 
-class OrderItemSerializer(serializers.ModelSerializer):
-    product_name = serializers.ReadOnlyField(source="product.name_uz")
-    product_name_ru = serializers.ReadOnlyField(source="product.name_ru")
-    product_name_eng = serializers.ReadOnlyField(source="product.name_eng")
-
-    class Meta:
-        model = OrderItem
-        fields = ["id", "product", "product_name", "product_name_ru", "product_name_eng", "quantity", "price_at_order"]
-
-    def create(self, validated_data):
-        items_data = validated_data.pop('items')
-        user = self.context['request'].user
-
-        # 1. Avval buyurtmani boshlang'ich narx 0 bilan yaratamiz (yoki hisoblab yaratamiz)
-        order = Order.objects.create(user=user, total_price=0, **validated_data)
-
-        total_price = 0
-        for item_data in items_data:
-            product = item_data['product']
-            quantity = item_data['quantity']
-            price = product.price * quantity
-            total_price += price
-
-            OrderItem.objects.create(order=order, product=product, quantity=quantity, price=product.price)
-
-        # 2. Hisoblangan umumiy narxni order'ga yozib saqlaymiz
-        order.total_price = total_price
-        order.save()
-
-        return order
-
-
 class OrderListSerializer(serializers.ModelSerializer):
     total_price = serializers.SerializerMethodField()
     short_address = serializers.SerializerMethodField()
@@ -203,14 +171,13 @@ class OrderListSerializer(serializers.ModelSerializer):
     def get_total_price(self, obj):
         if hasattr(obj, "total_price") and obj.total_price is not None:
             return obj.total_price
-        return sum(item.price_at_order * item.quantity for item in obj.order_items.all())
+        return 0
 
     def get_short_address(self, obj):
         return (obj.address[:80] + "...") if obj.address and len(obj.address) > 80 else obj.address
 
 
 class OrderDetailSerializer(serializers.ModelSerializer):
-    order_items = OrderItemSerializer(many=True, read_only=True)
     delivery_details = serializers.SerializerMethodField()
 
     class Meta:
@@ -218,7 +185,6 @@ class OrderDetailSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "user",
-            "order_items",
             "total_price",
             "status",
             "address",
@@ -228,7 +194,6 @@ class OrderDetailSerializer(serializers.ModelSerializer):
         read_only_fields = [
             "id",
             "user",
-            "order_items",
             "total_price",
             "created_at",
             "delivery_details",
@@ -241,6 +206,7 @@ class OrderDetailSerializer(serializers.ModelSerializer):
             "accepted_at": obj.accepted_at,
             "delivered_at": obj.delivered_at,
         }
+
 
 
 

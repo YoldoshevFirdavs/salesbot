@@ -2,8 +2,32 @@
 from telegram import KeyboardButton, ReplyKeyboardMarkup
 import bot_globals as globals
 from database import Database
+import re
 
 db = Database()
+
+def validate_phone(phone):
+    """
+    Validates Uzbek phone numbers
+    Returns: (is_valid, formatted_phone)
+    """
+    if not phone:
+        return False, None
+    
+    # Remove spaces and dashes
+    cleaned = re.sub(r'[\s\-]', '', phone)
+    
+    # Pattern: +998 followed by 9 digits
+    pattern = r'^\+998\d{9}$'
+    if re.match(pattern, cleaned):
+        return True, cleaned
+    
+    # Also accept local format (without +998)
+    pattern_local = r'^998\d{9}$'
+    if re.match(pattern_local, cleaned):
+        return True, f"+{cleaned}"
+    
+    return False, None
 
 def show_my_orders(update, db_user):
     """
@@ -73,3 +97,49 @@ def show_my_orders(update, db_user):
             resize_keyboard=True
         )
     )
+
+def create_order_from_cart(chat_id, db_user, carts, payment_method):
+    """
+    Creates an order from cart items
+    
+    Args:
+        chat_id: Telegram chat ID
+        db_user: User data from database
+        carts: Dictionary of {product_id: quantity}
+        payment_method: 1 = cash, 2 = card
+        
+    Returns:
+        order_id or None
+    """
+    from django.contrib.auth import get_user_model
+    from tgbot.models import Order
+    
+    User = get_user_model()
+    
+    try:
+        # Get Django user
+        django_user = User.objects.get(id=db_user['id'])
+        
+        # Calculate total price
+        total_price = 0
+        for product_id, quantity in carts.items():
+            product = db.get_product_by_id(int(product_id))
+            if product:
+                total_price += product['price'] * quantity
+        
+        # Create order
+        payment_type_map = {1: "cash", 2: "card"}
+        order = Order.objects.create(
+            user=django_user,
+            total_price=total_price,
+            status="Pending",
+            payment_method=payment_type_map.get(payment_method, "cash"),
+            phone_number=db_user.get('phone_number', ''),
+            address=""  # Will be set when user sends location
+        )
+        
+        return order.id
+        
+    except Exception as e:
+        print(f"Error creating order: {e}")
+        return None

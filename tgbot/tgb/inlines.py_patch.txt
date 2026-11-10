@@ -1,0 +1,9 @@
+                # Send product image if available
+                if product.get(image):
+                    try:
+                        query.message.reply_photo(
+                            photo=open(product[image], rb),
+                            caption=caption,
+                            reply_markup=InlineKeyboardMarkup(inline_keyboard=buttons)
+                        )
+                        logger.info(f📷

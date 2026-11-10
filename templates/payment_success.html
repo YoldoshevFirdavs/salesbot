@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To'lov Muvaffaqiyatli - SalesBot</title>
+    <link rel="stylesheet" href="/static/theme.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        main {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            padding: 40px 20px;
+        }
+        
+        .success-container {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.15);
+            padding: 70px 50px;
+            max-width: 550px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid var(--border-light);
+            animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .success-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 40px;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            animation: popIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 15px 50px rgba(102, 126, 234, 0.35);
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+        }
+        
+        .success-icon::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 4px solid var(--accent-primary);
+            opacity: 0;
+            animation: pulse-ring 1.5s ease-out 0.4s forwards;
+        }
+        
+        @keyframes popIn {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(0.8);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.8);
+                opacity: 0;
+            }
+        }
+        
+        h1 {
+            color: var(--text-primary);
+            margin-bottom: 14px;
+            font-size: 38px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 17px;
+            margin-bottom: 35px;
+            font-weight: 500;
+            line-height: 1.6;
+        }
+        
+        .status-message {
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.08), rgba(40, 167, 69, 0.03));
+            border-left: 5px solid var(--success);
+            color: var(--text-primary);
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 35px;
+            font-size: 15px;
+            text-align: left;
+            animation: slideInLeft 0.6s ease 0.2s both;
+        }
+        
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .status-message strong {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--success);
+            font-weight: 700;
+        }
+        
+        .order-id {
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            padding: 24px;
+            border-radius: 14px;
+            margin-bottom: 35px;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+            animation: slideInRight 0.6s ease 0.3s both;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .order-id-label {
+            display: block;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .order-id-value {
+            font-size: 32px;
+            color: white;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+        
+        .info-text {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 35px;
+            line-height: 1.7;
+            animation: fadeIn 0.6s ease 0.4s both;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 14px;
+            flex-direction: column;
+            animation: fadeIn 0.6s ease 0.5s both;
+        }
+        
+        .btn {
+            padding: 16px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s ease;
+            z-index: 0;
+        }
+        
+        .btn span {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            color: white;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+        
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 2px solid var(--border-light);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08));
+            border-color: var(--accent-primary);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+        }
+        
+        .btn-secondary:hover::before {
+            left: 100%;
+        }
+        
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-light) 20%, var(--border-light) 80%, transparent);
+            margin: 35px 0;
+        }
+        
+        .footer-text {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            font-weight: 500;
+        }
+        
+        @media (max-width: 600px) {
+            .success-container {
+                padding: 50px 30px;
+            }
+            
+            h1 {
+                font-size: 30px;
+            }
+            
+            .success-icon {
+                width: 100px;
+                height: 100px;
+                font-size: 50px;
+                margin-bottom: 30px;
+            }
+            
+            .order-id-value {
+                font-size: 28px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include "header.html" %}
+    
+    <main>
+        <div class="success-container">
+            <div class="success-icon">✅</div>
+            
+            <h1>To'lov Muvaffaqiyatli!</h1>
+            <p class="subtitle">Sizning buyurtmangiz muvaffaqiyatli qabul qilindi va tayyorlanmoqda</p>
+            
+            <div class="status-message">
+                <strong>✨ Buyurtma Tasdiqlandi</strong>
+                Telegram botingizga ma'lumot yuboriladi. Admin tez orada sizga aloqaga chiqadi.
+            </div>
+            
+            <div class="order-id">
+                <span class="order-id-label">🆔 Buyurtma Raqami</span>
+                <div class="order-id-value">#{{ order_id }}</div>
+            </div>
+            
+            <p class="info-text">
+                💳 <strong>To'lov muvaffaqiyatli amalga oshirildi</strong><br>
+                Yetkazib berish vaqti: 30-45 daqiqa<br>
+                Buyurtma tafsili Telegram botda ko'rsatiladi
+            </p>
+            
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="goToBot()">
+                    <span>📱 Telegram Botga Qaytish</span>
+                </button>
+                <button class="btn btn-secondary" onclick="goToHome()">
+                    <span>🏠 Bosh Sahifaga Qaytish</span>
+                </button>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <p class="footer-text">
+                Agar sizda savol bo'lsa, admin bilan aloqaga chiqing yoki botda "Yordam" tugmasini bosing.
+            </p>
+        </div>
+    </main>
+
+    <script>
+        function goToBot() {
+            window.open('https://t.me/fastbite_uz_bot', '_blank');
+        }
+        
+        function goToHome() {
+            window.location.href = '/';
+        }
+        
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+        }
+        
+        const saved = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', saved);
+        
+        function createConfetti() {
+            const confetti = document.createElement('div');
+            confetti.style.position = 'fixed';
+            confetti.style.width = '10px';
+            confetti.style.height = '10px';
+            confetti.style.backgroundColor = ['#667eea', '#764ba2', '#28a745'][Math.floor(Math.random() * 3)];
+            confetti.style.borderRadius = '50%';
+            confetti.style.left = Math.random() * window.innerWidth + 'px';
+            confetti.style.top = '-10px';
+            confetti.style.pointerEvents = 'none';
+            confetti.style.zIndex = '999';
+            
+            document.body.appendChild(confetti);
+            
+            const duration = 2000 + Math.random() * 1000;
+            const startTime = Date.now();
+            
+            function animate() {
+                const elapsed = Date.now() - startTime;
+                const progress = elapsed / duration;
+                
+                if (progress < 1) {
+                    confetti.style.top = (progress * window.innerHeight) + 'px';
+                    confetti.style.opacity = 1 - progress;
+                    requestAnimationFrame(animate);
+                } else {
+                    confetti.remove();
+                }
+            }
+            
+            animate();
+        }
+        
+        for (let i = 0; i < 30; i++) {
+            setTimeout(createConfetti, i * 30);
+        }
+    </script>
+</body>
+</html>

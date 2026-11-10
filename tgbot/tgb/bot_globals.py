@@ -242,6 +242,119 @@ BTN_SEND_LOCATION = {
     3:"📍 Send location"
 }
 
+# Payment methods
+PAYMENT_METHOD = {
+    1: {"uz": "Naqd pul", "ru": "Наличные", "eng": "Cash"},
+    2: {"uz": "Karta", "ru": "Карта", "eng": "Card"}
+}
+
+PAYMENT_BTN_TEXT = {
+    1: "Naqd pul",  # For button display
+    2: "Karta"
+}
+
+PAYMENT_BTN_TEXT_RU = {
+    1: "Наличные",
+    2: "Карта"
+}
+
+PAYMENT_BTN_TEXT_ENG = {
+    1: "Cash",
+    2: "Card"
+}
+
+# Combined for all languages
+BTN_PAY_CASH = {
+    1: "Naqd pul",
+    2: "Наличные",
+    3: "Cash"
+}
+
+BTN_PAY_CARD = {
+    1: "Karta",
+    2: "Карта",
+    3: "Card"
+}
+
+BTNS_PAYMENT = {
+    1: [
+        [KeyboardButton(text="Naqd pul"), KeyboardButton(text="Karta")],
+        [KeyboardButton(text="Orqaga")]
+    ],
+    2: [
+        [KeyboardButton(text="Наличные"), KeyboardButton(text="Карта")],
+        [KeyboardButton(text="Назад")]
+    ],
+    3: [
+        [KeyboardButton(text="Cash"), KeyboardButton(text="Card")],
+        [KeyboardButton(text="Back")]
+    ]
+}
+
+BTNS_PAYMENT_INLINE = {
+    1: [
+        [InlineKeyboardButton(text="Naqd pul", callback_data="order_payment_1")],
+        [InlineKeyboardButton(text="Karta", callback_data="order_payment_2")]
+    ],
+    2: [
+        [InlineKeyboardButton(text="Наличные", callback_data="order_payment_1")],
+        [InlineKeyboardButton(text="Карта", callback_data="order_payment_2")]
+    ],
+    3: [
+        [InlineKeyboardButton(text="Cash", callback_data="order_payment_1")],
+        [InlineKeyboardButton(text="Card", callback_data="order_payment_2")]
+    ]
+}
+
+BTNS_PAYMENT_INLINE_RU = {
+    1: [
+        [InlineKeyboardButton(text="Naqd pul", callback_data="order_payment_1")],
+        [InlineKeyboardButton(text="Karta", callback_data="order_payment_2")]
+    ],
+    2: [
+        [InlineKeyboardButton(text="Наличные", callback_data="order_payment_1")],
+        [InlineKeyboardButton(text="Карта", callback_data="order_payment_2")]
+    ],
+    3: [
+        [InlineKeyboardButton(text="Cash", callback_data="order_payment_1")],
+        [InlineKeyboardButton(text="Card", callback_data="order_payment_2")]
+    ]
+}
+
+BTNS_PAYMENT_INLINE_ENG = {
+    1: [
+        [InlineKeyboardButton(text="Naqd pul", callback_data="order_payment_1")],
+        [InlineKeyboardButton(text="Karta", callback_data="order_payment_2")]
+    ],
+    2: [
+        [InlineKeyboardButton(text="Наличные", callback_data="order_payment_1")],
+        [InlineKeyboardButton(text="Карта", callback_data="order_payment_2")]
+    ],
+    3: [
+        [InlineKeyboardButton(text="Cash", callback_data="order_payment_1")],
+        [InlineKeyboardButton(text="Card", callback_data="order_payment_2")]
+    ]
+}
+
+PAYMENT_METHOD_TEXT = {
+    1: "Naqd pul",  # For order summary
+    2: "Karta"
+}
+
+PAYMENT_METHOD_TEXT_RU = {
+    1: "Наличные",
+    2: "Карта"
+}
+
+PAYMENT_METHOD_TEXT_ENG = {
+    1: "Cash",
+    2: "Card"
+}
+
+PAYMENT_METHOD_FULL = {
+    1: {"uz": "Naqd pul", "ru": "Наличные", "eng": "Cash"},
+    2: {"uz": "Karta", "ru": "Карта", "eng": "Card"}
+}
 
 
 
@@ -251,3 +364,24 @@ BTN_SEND_LOCATION = {
 
 
 
+
+
+
+PAYMENT_TEXT = {
+    'cash': {
+        1: "Naqd pul",
+        2: "Наличные",
+        3: "Cash"
+    },
+    'card': {
+        1: "Karta",
+        2: "Карта",
+        3: "Card"
+    }
+}
+
+TEXT_PAYMENT_CHOICE = {
+    1: "💰 To'lov usulini tanlang:",
+    2: "💰 Выберите способ оплаты:",
+    3: "💰 Choose payment method:"
+}

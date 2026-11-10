@@ -77,7 +77,8 @@ INSTALLED_APPS = [
     "tgbot",
     "dashboard",
     "users",
-    'rest_framework_simplejwt.token_blacklist'
+    'rest_framework_simplejwt.token_blacklist',
+    'payment'
 ]
 
 MIDDLEWARE = [
@@ -218,6 +219,17 @@ SIMPLE_JWT = {
 
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
+TELEGRAM_BOT_TOKEN = BOT_TOKEN  # Alias for Stripe webhook notifications
+
+# Stripe Configuration
+STRIPE_PUBLIC_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY")
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
+STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
+
+# Stripe keys
+STRIPE_PUBLIC_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY")
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
+STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
 
 _env_log_file = os.getenv("LOG_FILE", "")
 if _env_log_file:

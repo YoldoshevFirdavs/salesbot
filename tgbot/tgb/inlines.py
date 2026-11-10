@@ -1,3 +1,5 @@
+﻿import os
+
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton
 from database import Database
 import bot_globals as globals
@@ -10,6 +12,11 @@ def inline_handler(update, context):
     query = update.callback_query
     data_sp = str(query.data).split("_")
     db_user = db.get_user_by_chat_id(query.message.chat_id)
+    
+    # Null check for db_user
+    if not db_user:
+        query.message.reply_text("Iltimos, avval /start buyrug'ini bosing.")
+        return
 
     if data_sp[0] == "category":
         if data_sp[1] == "product":
@@ -44,7 +51,15 @@ def inline_handler(update, context):
                 # Add to cart
                 query.message.delete()
                 carts = context.user_data.get("carts", {})
-                carts[f"{data_sp[2]}"] = carts.get(f"{data_sp[2]}", 0) + int(data_sp[3])
+                try:
+                    quantity = int(data_sp[3])
+                    product = db.get_product_by_id(int(data_sp[2]))
+                    if product['stock'] < quantity:
+                        query.message.reply_text("Yetarli zaxira yo'q!")
+                        return
+                    carts[f"{data_sp[2]}"] = carts.get(f"{data_sp[2]}", 0) + quantity
+                except ValueError:
+                    logger.error(f"Invalid quantity: {data_sp[3]}")
                 context.user_data["carts"] = carts
                 logger.info(f"🛒 CART: User {db_user['chat_id']} added product {data_sp[2]} to cart, quantity: {data_sp[3]}")
 
@@ -103,19 +118,25 @@ def inline_handler(update, context):
                     [InlineKeyboardButton(text="🔙 Orqaga", callback_data=f"category_product_back_{product['category_id']}")],
                 ]
 
-                try:
-                    # Use direct file path instead of database path
-                    image_path = f"/app/media/products/main/product_{data_sp[2]}.jpg"
-                    query.message.reply_photo(
-                        photo=open(image_path, "rb"),
-                        caption=caption,
-                        reply_markup=InlineKeyboardMarkup(inline_keyboard=buttons)
-                    )
-                    logger.info(f"📷 IMAGE: Sent product {data_sp[2]} image successfully")
-                except Exception as e:
-                    logger.error(f"❌ IMAGE ERROR: Could not send image for product {data_sp[2]}: {e}")
+                # Send product image if available
+                if product.get('image'):
+                    try:
+                        query.message.reply_photo(
+                            photo=open(product['image'], 'rb'),
+                            caption=caption,
+                            reply_markup=InlineKeyboardMarkup(inline_keyboard=buttons)
+                        )
+                        logger.info(f"📷 IMAGE: Sent product {data_sp[2]} image from database path: {product['image']}")
+                    except Exception as e:
+                        logger.error(f"❌ IMAGE ERROR: Could not send image for product {data_sp[2]}: {e}")
+                        query.message.reply_text(
+                            text=f"{caption}\n\n⚠️ Rasm yuklanmadi",
+                            reply_markup=InlineKeyboardMarkup(inline_keyboard=buttons)
+                        )
+                else:
+                    logger.warning(f"⚠️ NO IMAGE: Product {data_sp[2]} has no image in database")
                     query.message.reply_text(
-                        text=f"{caption}\n\n(rasm topilmadi)",
+                        text=f"{caption}\n\n📷 Rasm mavjud emas",
                         reply_markup=InlineKeyboardMarkup(inline_keyboard=buttons)
                     )
         
@@ -226,18 +247,45 @@ def inline_handler(update, context):
     
     elif data_sp[0] == "order":
         if len(data_sp) > 1 and data_sp[1] == "payment":
-            context.user_data['payment_type'] = int(data_sp[2])
+            payment_method = int(data_sp[2])  # 1 = cash, 2 = card
+            context.user_data['payment_method'] = payment_method
             query.message.delete()
-            query.message.reply_text(
-                text=globals.BTN_SEND_LOCATION[db_user["language"]],
-                reply_markup=ReplyKeyboardMarkup(
-                    [[KeyboardButton(text=globals.BTN_SEND_LOCATION[db_user["language"]], request_location=True)]],
-                    resize_keyboard=True
+            
+            if payment_method == 2:  # Card payment - show Stripe checkout link
+                # Get user's orders to find the most recent one
+                carts = context.user_data.get("carts", {})
+                if carts:
+                    from order_utils import create_order_from_cart
+                    order_id = create_order_from_cart(db_user['chat_id'], db_user, carts, payment_method)
+                    
+                    if order_id:
+                        checkout_url = f"{os.getenv('API_BASE_URL')}/checkout/{order_id}/"
+                        query.message.reply_text(
+                            text=(
+                                f"💳 <b>Karta to'lovini amalga oshiring</b>\n\n"
+                                f"Pastdagi linkga bosib, to'lov ma'lumotlarini kiriting:\n\n"
+                                f"<a href='{checkout_url}'>💳 To'lovni amalga oshirish</a>\n\n"
+                                f"To'lov muvaffaqiyatli bo'lgandan keyin avtomatik ravishda qayta Telegramga qaytarsiz."
+                            ),
+                            parse_mode='HTML',
+                            disable_web_page_preview=False
+                        )
+                        logger.info(f"💳 PAYMENT LINK: User {db_user['chat_id']} sent Stripe checkout link for order {order_id}")
+                    else:
+                        query.message.reply_text("❌ Buyurtma yaratishda xatolik yuz berdi")
+            else:  # Cash payment
+                query.message.reply_text(
+                    text=globals.BTN_SEND_LOCATION[db_user["language"]],
+                    reply_markup=ReplyKeyboardMarkup(
+                        [[KeyboardButton(text=globals.BTN_SEND_LOCATION[db_user["language"]], request_location=True)]],
+                        resize_keyboard=True
+                    )
                 )
-            )
         else:
             buttons = [
-                [InlineKeyboardButton(text="Naqd pul", callback_data="order_payment_1")],
-                [InlineKeyboardButton(text="Karta", callback_data="order_payment_2")],
+                [
+                    InlineKeyboardButton(text=f"💵 {globals.PAYMENT_TEXT['cash'][db_user['language']]}", callback_data="order_payment_1"),
+                    InlineKeyboardButton(text=f"💳 {globals.PAYMENT_TEXT['card'][db_user['language']]}", callback_data="order_payment_2"),
+                ]
             ]
             query.message.edit_reply_markup(reply_markup=InlineKeyboardMarkup(inline_keyboard=buttons))
